@@ -56,17 +56,8 @@ public class CropView extends View {
 
   private void init() {
     paint.setColor(Color.YELLOW);
-    paint.setStrokeWidth(10);
+    paint.setStrokeWidth(1);
     paint.setStyle(Paint.Style.STROKE);
-
-    for (int i = 0; i < cropPoints.length; i++) {
-      CropPoint cropPoint = new CropPoint();
-      cropPoints[i] = cropPoint;
-      cropPoint.x = i * 100 + 50;
-      cropPoint.y = i * 100 + 50;
-      cropPoint.radiusSize = 15;
-
-    }
 
     setOnTouchListener(new View.OnTouchListener() {
       @Override
@@ -116,7 +107,8 @@ public class CropView extends View {
 
     for (int i = 0; i <cropPoints.length ; i++) {
       CropPoint point = cropPoints[i];
-      canvas.drawCircle(point.x,point.y,point.radiusSize,paint);
+    //  canvas.drawCircle(point.x - point.radiusSize/2 ,point.y + point.radiusSize/2 ,point.radiusSize,paint);
+      canvas.drawCircle(point.x ,point.y,point.radiusSize,paint);
     }
 
 
@@ -134,7 +126,36 @@ public class CropView extends View {
     int spacingVertical = (int) ((h / 100f) * 10);
     int spacingHorizontal = (int) ((w / 100f) * 10);
 
-    rect = new Rect(spacingHorizontal,spacingVertical,w - spacingVertical ,w -  spacingHorizontal);
+    //todo перепроверить расчеты квадрата и точек
+
+    rect = new Rect(spacingHorizontal,spacingVertical,w - spacingVertical ,h -  spacingHorizontal);
+
+    CropPoint topLeft = new CropPoint();
+    CropPoint topRight = new CropPoint();
+    CropPoint bottomRight = new CropPoint();
+    CropPoint bottomLeft = new CropPoint();
+
+    cropPoints[0] = topLeft;
+    cropPoints[1] = topRight;
+    cropPoints[2] = bottomRight;
+    cropPoints[3] = bottomLeft;
+
+    setPointPos(topLeft, spacingVertical,spacingHorizontal);
+    setPointPos(topRight, w - spacingVertical,spacingHorizontal);
+    setPointPos(bottomRight, w - spacingVertical,h -  spacingHorizontal);
+    setPointPos(bottomLeft,  spacingVertical,h -  spacingHorizontal);
+
+  }
+
+  private void setPointPos(CropPoint cropPoint,int x , int y){
+    cropPoint.radiusSize = 15;
+    cropPoint.x = x;
+    cropPoint.y = y;
+
+  }
+
+  private void initPoints(int w, int h){
+
 
 
   }
