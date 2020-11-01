@@ -20,7 +20,7 @@ public class CropView extends View {
   private Rect srcImgRect = new Rect(0, 0, 200, 200);
   private Rect cropRect = new Rect(100, 100, 200, 200);
   private Rect dstImgRect = new Rect(0, 0, 200, 200);
-  private Paint paint = new Paint();
+  private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
   private Paint bitmapPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
   private float x = 0;
@@ -134,7 +134,7 @@ public class CropView extends View {
     int spacingVertical = (int) ((h / 100f) * 10);
     int spacingHorizontal = (int) ((w / 100f) * 10);
 
-    rect = new Rect(spacingHorizontal,spacingVertical,h - spacingVertical ,w -  spacingHorizontal);
+    rect = new Rect(spacingHorizontal,spacingVertical,w - spacingVertical ,w -  spacingHorizontal);
 
 
   }
