@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +21,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
+import com.astend.android.photocutter.App;
+import com.astend.android.photocutter.BuildConfig;
 import com.astend.android.photocutter.R;
 import com.astend.android.photocutter.ui.camera.CameraFragment;
 import com.astend.android.photocutter.ui.crop.view.CropView;
@@ -36,7 +39,9 @@ import static android.app.Activity.RESULT_OK;
 public class CropFragment extends Fragment {
 
 
+  public static final String PHOTO_PATH = "photoPath";
   private static final int REQUEST_IMAGE_CAPTURE = 1;
+
 
 
   @Override
@@ -73,11 +78,19 @@ public class CropFragment extends Fragment {
     textOk.setOnClickListener(v -> {
       Navigation.findNavController(view).navigate(R.id.action_cropFragment_to_finishFragment);
     });
+    Bitmap myBitmap;
 
-  //  String photoPath = getArguments().getString("photoPath");
-  //  Bitmap myBitmap = BitmapFactory.decodeFile(photoPath);
-    Bitmap myBitmap = BitmapFactory.decodeFile("/data/user/0/com.astend.android.photocutter/cache/2020-10-28-20-07-25-529.jpg");
+    if (BuildConfig.FLAVOR.equalsIgnoreCase("full")){
+        String photoPath = getArguments().getString(CropFragment.PHOTO_PATH);
+        myBitmap = BitmapFactory.decodeFile(photoPath);
+    }else {
+      String photoPath = App.preferences.getString(PHOTO_PATH,null);
+       myBitmap = BitmapFactory.decodeFile(photoPath);
+    }
     cropView.setImageBitmap(myBitmap);
+
+
+
 
 
   }

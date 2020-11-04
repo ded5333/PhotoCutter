@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_navigation"
-    app:startDestination="@id/cropFragment">
+    app:startDestination="@id/splashFragment">
 
     <fragment
         android:id="@+id/splashFragment"
@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_splashFragment_to_mainFragment2"
             app:destination="@id/mainFragment" />
+        <action
+            android:id="@+id/action_splashFragment_to_cropFragment"
+            app:destination="@id/cropFragment" />
     </fragment>
     <fragment
         android:id="@+id/mainFragment"

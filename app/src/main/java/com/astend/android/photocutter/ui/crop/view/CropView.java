@@ -55,7 +55,7 @@ public class CropView extends View {
   }
 
   private void init() {
-    paint.setColor(Color.YELLOW);
+    paint.setColor(Color.BLUE);
     paint.setStrokeWidth(1);
     paint.setStyle(Paint.Style.STROKE);
 
@@ -123,12 +123,12 @@ public class CropView extends View {
     dstImgRect.right = h;
     dstImgRect.bottom = w;
 
-    int spacingVertical = (int) ((h / 100f) * 10);
-    int spacingHorizontal = (int) ((w / 100f) * 10);
+    int spacingVertical = (int) ((h / 10f));
+    int spacingHorizontal = (int) ((w / 10f));
 
     //todo перепроверить расчеты квадрата и точек
 
-    rect = new Rect(spacingHorizontal,spacingVertical,w - spacingVertical ,h -  spacingHorizontal);
+    rect = new Rect(spacingVertical ,spacingHorizontal,w - spacingVertical ,h -  spacingHorizontal);
 
     CropPoint topLeft = new CropPoint();
     CropPoint topRight = new CropPoint();

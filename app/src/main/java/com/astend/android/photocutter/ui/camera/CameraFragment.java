@@ -1,16 +1,15 @@
 package com.astend.android.photocutter.ui.camera;
 
 import android.Manifest;
-import android.content.Intent;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,18 +20,17 @@ import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
+import com.astend.android.photocutter.App;
 import com.astend.android.photocutter.R;
 import com.astend.android.photocutter.ui.crop.CropFragment;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -110,15 +108,16 @@ public class CameraFragment extends Fragment {
           @Override
           public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
 
-            //navcotroller
-
-            Uri savedUri = Uri.fromFile(photoFile);
-            String msg = "Photo capture succeeded: " + savedUri;
+            String msg = "Photo capture succeeded: " + photoFile.toString();
             Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show();
             Log.d(TAG, msg);
 
             Bundle bundle = new Bundle();
-            bundle.putString("photoPath",photoFile.toString());
+            bundle.putString(CropFragment.PHOTO_PATH, photoFile.toString());
+
+            App.preferences.edit()
+                .putString(CropFragment.PHOTO_PATH, photoFile.toString())
+                .apply();
 
             Navigation.findNavController(CameraFragment.this.getView())
                 .navigate(R.id.action_cameraFragment_to_cropFragment, bundle);
