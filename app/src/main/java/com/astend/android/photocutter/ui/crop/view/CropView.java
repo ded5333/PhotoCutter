@@ -26,47 +26,70 @@ public class CropView extends View {
   private float x = 0;
   private float y = 0;
 
-  CropPoint[] cropPoints = new CropPoint[4];
+  /**
+   * -1 не выбрана не одна точка<br>
+   * в другом случае соотведствует индексу активной точки (cropPoint)
+   */
+  private int cropPointActivated = -1;
 
-
-  Bitmap bitmap = null;
+  private CropPoint[] cropPoints = new CropPoint[4];
+  private Bitmap bitmap = null;
 
   public CropView(Context context) {
     super(context);
-    init();
+    init(context);
+
   }
 
   public CropView(Context context, @Nullable AttributeSet attrs) {
     super(context, attrs);
-    init();
+    init(context);
 
   }
 
   public CropView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
-    init();
+    init(context);
 
   }
 
   public CropView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
     super(context, attrs, defStyleAttr, defStyleRes);
-    init();
+    init(context);
 
   }
 
-  private void init() {
+  private void init(Context context) {
     paint.setColor(Color.BLUE);
     paint.setStrokeWidth(1);
     paint.setStyle(Paint.Style.STROKE);
+
 
     setOnTouchListener(new View.OnTouchListener() {
       @Override
       public boolean onTouch(View v, MotionEvent event) {
         x = event.getX();
         y = event.getY();
-        Log.d("TAG", " x: " + x + " y: " + y);
-        cropPoints[0].x = x;
-        cropPoints[0].y = y;
+        Log.d("TAG", "Touch x: " + x + " y: " + y);
+
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+          for (int i = 0; i < cropPoints.length; ++i) {
+            if (cropPoints[i].getLeft() < x && cropPoints[i].getRight() > x
+                && cropPoints[i].getTop() < y && cropPoints[i].getBottom() > y) {
+              Log.d("TAG", "sdfgvhbjkl");
+
+              cropPointActivated = i;
+              break;
+            }
+          }
+          return true;
+        } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+          if (cropPointActivated != -1)
+            cropPoints[cropPointActivated].setPosition(x, y);
+        } else if (event.getAction() == MotionEvent.ACTION_UP) {
+          cropPointActivated = -1;
+        }
+
         invalidate();
         return true;
       }
@@ -78,10 +101,9 @@ public class CropView extends View {
 
         x = event.getX();
         y = event.getY();
-        Log.d("TAG", " x: " + x + " y: " + y);
+        Log.d("TAG", "Drag x: " + x + " y: " + y);
 
-        cropPoints[0].x = x;
-        cropPoints[0].y = y;
+//        cropPoints[0].setPosition(x,y);
         invalidate();
         return true;
       }
@@ -97,22 +119,19 @@ public class CropView extends View {
     invalidate();
   }
 
+
   @Override
   protected void onDraw(Canvas canvas) {
     super.onDraw(canvas);
     if (bitmap != null)
       canvas.drawBitmap(bitmap, srcImgRect, dstImgRect, bitmapPaint);
-    //  canvas.drawBitmap(bitmap,0,0,bitmapPaint);
+//      canvas.drawBitmap(bitmap,0,0,bitmapPaint);
     canvas.drawRect(rect, paint);
 
-    for (int i = 0; i <cropPoints.length ; i++) {
+    for (int i = 0; i < cropPoints.length; i++) {
       CropPoint point = cropPoints[i];
-    //  canvas.drawCircle(point.x - point.radiusSize/2 ,point.y + point.radiusSize/2 ,point.radiusSize,paint);
-      canvas.drawCircle(point.x ,point.y,point.radiusSize,paint);
+      canvas.drawCircle(point.getX(), point.getY(), point.getRadiusSize(), paint);
     }
-
-
-
   }
 
   @Override
@@ -126,9 +145,7 @@ public class CropView extends View {
     int spacingVertical = (int) ((h / 10f));
     int spacingHorizontal = (int) ((w / 10f));
 
-    //todo перепроверить расчеты квадрата и точек
-
-    rect = new Rect(spacingVertical ,spacingHorizontal,w - spacingVertical ,h -  spacingHorizontal);
+    rect = new Rect(spacingVertical, spacingHorizontal, w - spacingVertical, h - spacingHorizontal);
 
     CropPoint topLeft = new CropPoint();
     CropPoint topRight = new CropPoint();
@@ -140,24 +157,19 @@ public class CropView extends View {
     cropPoints[2] = bottomRight;
     cropPoints[3] = bottomLeft;
 
-    setPointPos(topLeft, spacingVertical,spacingHorizontal);
-    setPointPos(topRight, w - spacingVertical,spacingHorizontal);
-    setPointPos(bottomRight, w - spacingVertical,h -  spacingHorizontal);
-    setPointPos(bottomLeft,  spacingVertical,h -  spacingHorizontal);
+
+    setPointPos(topLeft, spacingVertical, spacingHorizontal);
+    setPointPos(topRight, w - spacingVertical, spacingHorizontal);
+    setPointPos(bottomRight, w - spacingVertical, h - spacingHorizontal);
+    setPointPos(bottomLeft, spacingVertical, h - spacingHorizontal);
 
   }
 
-  private void setPointPos(CropPoint cropPoint,int x , int y){
-    cropPoint.radiusSize = 15;
-    cropPoint.x = x;
-    cropPoint.y = y;
+  private void setPointPos(CropPoint cropPoint, int x, int y) {
+    cropPoint.setRadiusSize(15);
+    cropPoint.setPosition(x, y);
 
   }
 
-  private void initPoints(int w, int h){
-
-
-
-  }
 
 }

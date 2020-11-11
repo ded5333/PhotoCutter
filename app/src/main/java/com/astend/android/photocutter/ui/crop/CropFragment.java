@@ -40,9 +40,6 @@ public class CropFragment extends Fragment {
 
 
   public static final String PHOTO_PATH = "photoPath";
-  private static final int REQUEST_IMAGE_CAPTURE = 1;
-
-
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,

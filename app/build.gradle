@@ -18,18 +18,20 @@ android {
             applicationIdSuffix ".debug"
         }
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     flavorDimensions "version"
     productFlavors{
         demo{
-
+            versionNameSuffix " MyDemo"
         }
         full{
+          //  versionNameSuffix "Full"
 
         }
+
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
