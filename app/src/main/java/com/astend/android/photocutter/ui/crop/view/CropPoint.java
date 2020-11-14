@@ -5,6 +5,7 @@ public class CropPoint {
   private float y;
   private int radiusSize;
 
+
   private int left;//r1.x
   private int top;//r1.y
   private int right;//r3.x

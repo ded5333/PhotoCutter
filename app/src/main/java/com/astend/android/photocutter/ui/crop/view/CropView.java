@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.DragEvent;
@@ -16,21 +17,22 @@ import androidx.annotation.Nullable;
 
 public class CropView extends View {
 
-  private Rect rect = new Rect(100, 100, 200, 200);
+  private RectF rect = new RectF(100, 100, 200, 200);
   private Rect srcImgRect = new Rect(0, 0, 200, 200);
   private Rect cropRect = new Rect(100, 100, 200, 200);
   private Rect dstImgRect = new Rect(0, 0, 200, 200);
   private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
   private Paint bitmapPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-  private float x = 0;
-  private float y = 0;
 
   /**
    * -1 не выбрана не одна точка<br>
    * в другом случае соотведствует индексу активной точки (cropPoint)
    */
   private int cropPointActivated = -1;
+  private int cropPointActivatedSize = 25;
+  private int cropPointNormalSize = 15;
+
 
   private CropPoint[] cropPoints = new CropPoint[4];
   private Bitmap bitmap = null;
@@ -61,32 +63,22 @@ public class CropView extends View {
 
   private void init(Context context) {
     paint.setColor(Color.BLUE);
-    paint.setStrokeWidth(1);
+    paint.setStrokeWidth(4);
     paint.setStyle(Paint.Style.STROKE);
 
 
     setOnTouchListener(new View.OnTouchListener() {
       @Override
       public boolean onTouch(View v, MotionEvent event) {
-        x = event.getX();
-        y = event.getY();
-        Log.d("TAG", "Touch x: " + x + " y: " + y);
-
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
-          for (int i = 0; i < cropPoints.length; ++i) {
-            if (cropPoints[i].getLeft() < x && cropPoints[i].getRight() > x
-                && cropPoints[i].getTop() < y && cropPoints[i].getBottom() > y) {
-              Log.d("TAG", "sdfgvhbjkl");
-
-              cropPointActivated = i;
-              break;
-            }
-          }
+          findCropPoint(event.getX(), event.getY());
           return true;
-        } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-          if (cropPointActivated != -1)
-            cropPoints[cropPointActivated].setPosition(x, y);
-        } else if (event.getAction() == MotionEvent.ACTION_UP) {
+        }
+        else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+          onActionMove(event.getX(), event.getY());
+        }
+        else if (event.getAction() == MotionEvent.ACTION_UP) {
+          cropPoints[cropPointActivated].setRadiusSize(cropPointNormalSize);
           cropPointActivated = -1;
         }
 
@@ -99,12 +91,7 @@ public class CropView extends View {
       @Override
       public boolean onDrag(View v, DragEvent event) {
 
-        x = event.getX();
-        y = event.getY();
-        Log.d("TAG", "Drag x: " + x + " y: " + y);
-
-//        cropPoints[0].setPosition(x,y);
-        invalidate();
+        //  invalidate();
         return true;
       }
     });
@@ -145,7 +132,7 @@ public class CropView extends View {
     int spacingVertical = (int) ((h / 10f));
     int spacingHorizontal = (int) ((w / 10f));
 
-    rect = new Rect(spacingVertical, spacingHorizontal, w - spacingVertical, h - spacingHorizontal);
+    rect = new RectF(spacingVertical, spacingHorizontal, w - spacingVertical, h - spacingHorizontal);
 
     CropPoint topLeft = new CropPoint();
     CropPoint topRight = new CropPoint();
@@ -163,13 +150,77 @@ public class CropView extends View {
     setPointPos(bottomRight, w - spacingVertical, h - spacingHorizontal);
     setPointPos(bottomLeft, spacingVertical, h - spacingHorizontal);
 
+
   }
 
   private void setPointPos(CropPoint cropPoint, int x, int y) {
-    cropPoint.setRadiusSize(15);
+    cropPoint.setRadiusSize(cropPointNormalSize);
     cropPoint.setPosition(x, y);
 
   }
 
+  private void calculatePoints() {
+    for (int i = 0; i < cropPoints.length; i++) {
+      if (i == cropPointActivated) continue;
+
+      CropPoint cropPoint = cropPoints[i];
+
+      switch (i) {
+        case 0:
+          cropPoint.setPosition(rect.left, rect.top);
+          break;
+        case 1:
+          cropPoint.setPosition(rect.right, rect.top);
+          break;
+        case 2:
+          cropPoint.setPosition(rect.right, rect.bottom);
+          break;
+        case 3:
+          cropPoint.setPosition(rect.left, rect.bottom);
+          break;
+      }
+    }
+  }
+
+  private void onActionMove(float x, float y) {
+    if (cropPointActivated == -1)
+      return;
+
+    CropPoint cropPoint = cropPoints[cropPointActivated];
+    cropPoint.setPosition(x, y);
+    switch (cropPointActivated) {
+      case 0:
+        rect.left = cropPoint.getX();
+        rect.top = cropPoint.getY();
+        break;
+      case 1:
+        rect.top = cropPoint.getY();
+        rect.right = cropPoint.getX();
+        break;
+      case 2:
+        rect.right = cropPoint.getX();
+        rect.bottom = cropPoint.getY();
+        break;
+      case 3:
+        rect.bottom = cropPoint.getY();
+        rect.left = cropPoint.getX();
+        break;
+    }
+    calculatePoints();
+  }
+
+  private void findCropPoint(float x, float y) {
+    for (int i = 0; i < cropPoints.length; ++i) {
+      CropPoint cropPoint = cropPoints[i];
+      if (cropPoints[i].getLeft() < x && cropPoints[i].getRight() > x
+          && cropPoints[i].getTop() < y && cropPoints[i].getBottom() > y) {
+        cropPoint.setRadiusSize(cropPointActivatedSize);
+
+        cropPointActivated = i;
+        break;
+      }
+    }
+
+  }
 
 }
