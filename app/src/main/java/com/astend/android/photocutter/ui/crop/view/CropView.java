@@ -10,13 +10,16 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.Nullable;
 
 public class CropView extends View {
+
+  private final int cropPointActivatedSize = 25;
+  private final int cropPointNormalSize = 15;
+  private final int intersectionPadding = 75;
 
   private RectF rect = new RectF(100, 100, 200, 200);
   private Rect srcImgRect = new Rect(0, 0, 200, 200);
@@ -26,15 +29,11 @@ public class CropView extends View {
 
   boolean isSize;
 
-
   /**
    * -1 не выбрана не одна точка<br>
    * в другом случае соотведствует индексу активной точки (cropPoint)
    */
   private int cropPointActivated = -1;
-  private final int cropPointActivatedSize = 25;
-  private final int cropPointNormalSize = 15;
-
 
   private CropPoint[] cropPoints = new CropPoint[4];
   private Bitmap bitmap = null;
@@ -42,25 +41,21 @@ public class CropView extends View {
   public CropView(Context context) {
     super(context);
     init(context);
-
   }
 
   public CropView(Context context, @Nullable AttributeSet attrs) {
     super(context, attrs);
     init(context);
-
   }
 
   public CropView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
     init(context);
-
   }
 
   public CropView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
     super(context, attrs, defStyleAttr, defStyleRes);
     init(context);
-
   }
 
   private void init(Context context) {
@@ -68,26 +63,20 @@ public class CropView extends View {
     paint.setStrokeWidth(4);
     paint.setStyle(Paint.Style.STROKE);
 
-
     setOnTouchListener(new View.OnTouchListener() {
+      private boolean isBlocked;
       @Override
       public boolean onTouch(View v, MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
           findCropPoint(event.getX(), event.getY());
           return true;
-        }
-        else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-//          if (rect.right - rect.left > 20 && rect.bottom - rect.top > 20) {
-//
-//
-//          }
-          onActionMove(event.getX(), event.getY());
-
-
-        }
-        else if (event.getAction() == MotionEvent.ACTION_UP) {
-          if (cropPointActivated != -1)
-            cropPoints[cropPointActivated].setRadiusSize(cropPointNormalSize);
+        } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+          if (isBlocked)
+            return false;
+          else
+            isBlocked = onActionMove(event.getX(), event.getY());
+        } else if (event.getAction() == MotionEvent.ACTION_UP) {
+          isBlocked = false;
           cropPointActivated = -1;
         }
 
@@ -111,7 +100,6 @@ public class CropView extends View {
     invalidate();
   }
 
-
   @Override
   protected void onDraw(Canvas canvas) {
     super.onDraw(canvas);
@@ -121,15 +109,16 @@ public class CropView extends View {
 
     for (int i = 0; i < cropPoints.length; i++) {
       CropPoint point = cropPoints[i];
-      canvas.drawCircle(point.getX(), point.getY(), point.getRadiusSize(), paint);
+      if (cropPointActivated != -1 && i == cropPointActivated)
+        canvas.drawCircle(point.getX(), point.getY(), cropPointActivatedSize, paint);
+      else
+        canvas.drawCircle(point.getX(), point.getY(), cropPointNormalSize, paint);
     }
   }
 
   @Override
   protected void onSizeChanged(int w, int h, int oldw, int oldh) {
     super.onSizeChanged(w, h, oldw, oldh);
-    Log.d("TAG", "onSizeChange ");
-    Log.d("TAG", " w: " + w + " h: " + h);
     dstImgRect.right = w;
     dstImgRect.bottom = h;
 
@@ -148,20 +137,18 @@ public class CropView extends View {
     cropPoints[2] = bottomRight;
     cropPoints[3] = bottomLeft;
 
-
     setPointPos(topLeft, spacingVertical, spacingHorizontal);
     setPointPos(topRight, w - spacingVertical, spacingHorizontal);
     setPointPos(bottomRight, w - spacingVertical, h - spacingHorizontal);
     setPointPos(bottomLeft, spacingVertical, h - spacingHorizontal);
-
-
   }
 
   public void cropBitmap() {
-    Log.d("TAG", "Image width    " + bitmap.getWidth() + " heigth " + bitmap.getHeight());
-    Log.d("TAG", "cropview width  " + getWidth() + " heigth " + getHeight());
-    Log.d("TAG", "rect " + rect.toString());
-    bitmap = Bitmap.createBitmap(bitmap, (int) rect.left, (int) rect.top, (int) rect.right, (int) rect.bottom);
+    Log.d("TAG", "Image width: " + bitmap.getWidth() + " heigth: " + bitmap.getHeight());
+    Log.d("TAG", "cropview width: " + getWidth() + " heigth: " + getHeight());
+    Log.d("TAG", "rect: " + rect.toString());
+    bitmap = Bitmap.createBitmap(
+        bitmap, (int) rect.left, (int) rect.top, (int) rect.right, (int) rect.bottom);
     invalidate();
   }
 
@@ -194,44 +181,30 @@ public class CropView extends View {
     }
   }
 
-  private void onActionMove(float x, float y) {
+  private boolean onActionMove(float x, float y) {
     if (cropPointActivated == -1)
-      return;
-//     if (rect.right - rect.left > 50 && rect.bottom - rect.top > 50) {
-//      return;
-//    }
-
+      return false;
 
     CropPoint cropPoint = cropPoints[cropPointActivated];
-
-    for (int i = 0; i < cropPoints.length; i++) {
-      if (i == cropPointActivated) continue;
-//      if (i == 3 && cropPointActivated == 0){
-//        continue;
-//      } else if (cropPointActivated == 3 && i == 1){
-//        continue;
-     // }
-//     if (cropPointActivated == 0 && i == 1){
-//        continue;
-//      }
-
-      CropPoint intersection = cropPoints[i];
-      //проверка пересичения двух квадратов
-      if ((cropPoint.getLeft() >= intersection.getLeft() && cropPoint.getLeft() <= intersection.getRight()
-          || cropPoint.getRight() >= intersection.getLeft() && cropPoint.getRight() <= intersection.getRight())
-          && (cropPoint.getTop() >= intersection.getTop() && cropPoint.getTop() <= intersection.getBottom()
-          || cropPoint.getBottom() >= intersection.getTop() && cropPoint.getBottom() <= intersection.getBottom() )) {
-
-        Log.d("TAG", "Пересикает " + cropPointActivated + " " + i);
-        return;
-
-
-      }
-    }
-
+    float saveXPos = cropPoint.getX();
+    float saveYPos = cropPoint.getY();
 
     cropPoint.setPosition(x, y);
 
+    for (int i = 0; i < cropPoints.length; i++) {
+      if (i == cropPointActivated) continue;
+
+      CropPoint intersection = cropPoints[i];
+
+      /*Log.d("TAG", "[" + cropPoint.getLeft() + "," + intersection.getTop() + ", " + cropPoint.getRight() + ", " + cropPoint.getBottom() + "]" +
+          "   [" + intersection.getLeft() + "," + intersection.getTop() + ", " + intersection.getRight() + ", " + intersection.getBottom() + "]");*/
+
+      if (isIntersectingRectangles(cropPoint, intersection)) {
+        Log.d("TAG", "Пересекает " + cropPointActivated + " " + i);
+        cropPoint.setPosition(saveXPos, saveYPos);
+        return true;
+      }
+    }
 
     switch (cropPointActivated) {
       case 0:
@@ -252,24 +225,32 @@ public class CropView extends View {
         break;
     }
 
-
     calculatePoints();
-
-
+    return false;
   }
 
   private void findCropPoint(float x, float y) {
     for (int i = 0; i < cropPoints.length; ++i) {
-      CropPoint cropPoint = cropPoints[i];
       if (cropPoints[i].getLeft() < x && cropPoints[i].getRight() > x
           && cropPoints[i].getTop() < y && cropPoints[i].getBottom() > y) {
-        cropPoint.setRadiusSize(cropPointActivatedSize);
-
         cropPointActivated = i;
         break;
       }
     }
+  }
 
+  private boolean isIntersectingRectangles(CropPoint a, CropPoint b) {
+    return isIntersectionByX(a, b) && isIntersectionByY(a, b);
+  }
+
+  private boolean isIntersectionByX(CropPoint a, CropPoint b) {
+    return intersectionPadding - a.getLeft() >= b.getLeft() && a.getLeft() <= b.getRight() - intersectionPadding
+        || intersectionPadding + a.getRight() >= b.getLeft() && a.getRight() <= b.getRight() + intersectionPadding;
+  }
+
+  private boolean isIntersectionByY(CropPoint a, CropPoint b) {
+    return intersectionPadding - a.getTop() >= b.getTop() && a.getTop() <= b.getBottom() - intersectionPadding
+        || intersectionPadding + a.getBottom() >= b.getTop() && a.getBottom() <= b.getBottom() + intersectionPadding;
   }
 
 }
