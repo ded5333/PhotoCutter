@@ -59,13 +59,14 @@ public class CropFragment extends Fragment {
 
 
     btnCrop.setOnClickListener(v -> {
-      btnCrop.setVisibility(View.INVISIBLE);
+      btnCrop.setEnabled(false);
       textOk.setVisibility(View.VISIBLE);
       textCancel.setVisibility(View.VISIBLE);
+      cropView.cropBitmap();
     });
 
     textCancel.setOnClickListener(v -> {
-      btnCrop.setVisibility(View.VISIBLE);
+      btnCrop.setEnabled(true);
       textOk.setVisibility(View.INVISIBLE);
       textCancel.setVisibility(View.INVISIBLE);
 
