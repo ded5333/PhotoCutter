@@ -12,13 +12,14 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 
 public class CropView extends View {
 
-  private final int cropPointActivatedSize = 25;
-  private final int cropPointNormalSize = 15;
+  private final int cropPointActivatedRadiusSize = 25;
+  private final int cropPointNormalRadiusSize = 15;
   private final int intersectionPadding = 75;
 
   private RectF rect = new RectF(100, 100, 200, 200);
@@ -28,6 +29,7 @@ public class CropView extends View {
   private Paint bitmapPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
   boolean isSize;
+
 
   /**
    * -1 не выбрана не одна точка<br>
@@ -65,17 +67,21 @@ public class CropView extends View {
 
     setOnTouchListener(new OnTouchListener() {
       private boolean isBlocked;
+
       @Override
       public boolean onTouch(View v, MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
-          findCropPoint(event.getX(), event.getY());
+          if (findCropPoint(event.getX(), event.getY()))
+            invalidate();
           return true;
-        } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+        }
+        else if (event.getAction() == MotionEvent.ACTION_MOVE) {
           if (isBlocked)
             return false;
           else
             isBlocked = onActionMove(event.getX(), event.getY());
-        } else if (event.getAction() == MotionEvent.ACTION_UP) {
+        }
+        else if (event.getAction() == MotionEvent.ACTION_UP) {
           isBlocked = false;
           cropPointActivated = -1;
         }
@@ -110,9 +116,9 @@ public class CropView extends View {
     for (int i = 0; i < cropPoints.length; i++) {
       CropPoint point = cropPoints[i];
       if (cropPointActivated != -1 && i == cropPointActivated)
-        canvas.drawCircle(point.getX(), point.getY(), cropPointActivatedSize, paint);
+        canvas.drawCircle(point.getX(), point.getY(), cropPointActivatedRadiusSize, paint);
       else
-        canvas.drawCircle(point.getX(), point.getY(), cropPointNormalSize, paint);
+        canvas.drawCircle(point.getX(), point.getY(), cropPointNormalRadiusSize, paint);
     }
   }
 
@@ -147,15 +153,14 @@ public class CropView extends View {
     Log.d("TAG", "Image width: " + bitmap.getWidth() + " heigth: " + bitmap.getHeight());
     Log.d("TAG", "cropview width: " + getWidth() + " heigth: " + getHeight());
     Log.d("TAG", "rect: " + rect.toString());
-    bitmap = Bitmap.createBitmap(
-        bitmap, (int) rect.left, (int) rect.top, (int) rect.right, (int) rect.bottom);
+//    bitmap = Bitmap.createBitmap(
+//        bitmap, (int) rect.left, (int) rect.top, (int) rect.right, (int) rect.bottom);
     invalidate();
   }
 
   private void setPointPos(CropPoint cropPoint, int x, int y) {
-    cropPoint.setRadiusSize(cropPointNormalSize);
+    cropPoint.setRadiusSize(cropPointNormalRadiusSize);
     cropPoint.setPosition(x, y);
-
   }
 
   private void calculatePoints() {
@@ -190,6 +195,14 @@ public class CropView extends View {
     float saveYPos = cropPoint.getY();
 
     cropPoint.setPosition(x, y);
+
+    if (isOutOfBoundsView(cropPoint)) {
+      cropPoint.setPosition(
+          Math.max(saveXPos, cropPointNormalRadiusSize),
+          Math.max(saveYPos, cropPointNormalRadiusSize)
+      );
+      return false;
+    }
 
     for (int i = 0; i < cropPoints.length; i++) {
       if (i == cropPointActivated) continue;
@@ -229,14 +242,15 @@ public class CropView extends View {
     return false;
   }
 
-  private void findCropPoint(float x, float y) {
+  private boolean findCropPoint(float x, float y) {
     for (int i = 0; i < cropPoints.length; ++i) {
       if (cropPoints[i].getLeft() < x && cropPoints[i].getRight() > x
           && cropPoints[i].getTop() < y && cropPoints[i].getBottom() > y) {
         cropPointActivated = i;
-        break;
+        return true;
       }
     }
+    return false;
   }
 
   private boolean isIntersectingRectangles(CropPoint a, CropPoint b) {
@@ -251,6 +265,16 @@ public class CropView extends View {
   private boolean isIntersectionByY(CropPoint a, CropPoint b) {
     return intersectionPadding - a.getTop() >= b.getTop() && a.getTop() <= b.getBottom() - intersectionPadding
         || intersectionPadding + a.getBottom() >= b.getTop() && a.getBottom() <= b.getBottom() + intersectionPadding;
+  }
+
+  public boolean isOutOfBoundsView(CropPoint cropPoint) {
+    if (cropPointNormalRadiusSize > cropPoint.getX()
+        || cropPoint.getX() > getWidth() - cropPointNormalRadiusSize
+        || cropPointNormalRadiusSize > cropPoint.getY()
+        || cropPoint.getY() > getHeight() - cropPointNormalRadiusSize) {
+      return true;
+    }
+    return false;
   }
 
 }
