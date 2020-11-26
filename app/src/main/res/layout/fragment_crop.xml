@@ -55,7 +55,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textView18"
         android:layout_marginRight="26dp"/>
-    <com.astend.android.photocutter.ExtendedImageView
+    <com.astend.android.photocutter.utils.ExtendedImageView
         android:id="@+id/imageView"
         android:layout_width="0dp"
         android:layout_height="0dp"

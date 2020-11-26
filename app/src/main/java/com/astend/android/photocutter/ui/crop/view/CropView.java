@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -12,7 +11,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 
@@ -38,7 +36,7 @@ public class CropView extends View {
   private int cropPointActivated = -1;
 
   private CropPoint[] cropPoints = new CropPoint[4];
-  private Bitmap bitmap = null;
+  //private Bitmap bitmap = null;
 
   public CropView(Context context) {
     super(context);
@@ -94,7 +92,7 @@ public class CropView extends View {
     setOnDragListener((v, event) -> true);
   }
 
-  public void setImageBitmap(Bitmap bitmap) {
+  /*public void setImageBitmap(Bitmap bitmap) {
     Matrix matrix = new Matrix();
     matrix.setRotate(90);
     //todo необходимо изменить маштабирование изображения(вписать в квадрат)
@@ -104,13 +102,13 @@ public class CropView extends View {
     srcImgRect.bottom = bitmap.getHeight();
 
     invalidate();
-  }
+  }*/
 
   @Override
   protected void onDraw(Canvas canvas) {
     super.onDraw(canvas);
-    if (bitmap != null)
-      canvas.drawBitmap(bitmap, srcImgRect, dstImgRect, bitmapPaint);
+    /*if (bitmap != null)
+      canvas.drawBitmap(bitmap, srcImgRect, dstImgRect, bitmapPaint);*/
     canvas.drawRect(rect, paint);
 
     for (int i = 0; i < cropPoints.length; i++) {
@@ -149,13 +147,24 @@ public class CropView extends View {
     setPointPos(bottomLeft, spacingVertical, h - spacingHorizontal);
   }
 
-  public void cropBitmap() {
-    Log.d("TAG", "Image width: " + bitmap.getWidth() + " heigth: " + bitmap.getHeight());
-    Log.d("TAG", "cropview width: " + getWidth() + " heigth: " + getHeight());
+  public Bitmap cropBitmap(Bitmap bitmap,
+                         int imgSrcWidth,
+                         int imgSrcHeight,
+                         float widthAspectRatio,
+                         float heightAspectRatio) {
     Log.d("TAG", "rect: " + rect.toString());
-//    bitmap = Bitmap.createBitmap(
-//        bitmap, (int) rect.left, (int) rect.top, (int) rect.right, (int) rect.bottom);
-    invalidate();
+    //тут наверное нужно перемножить позиции квадрата на aspectRatio и получится узнать позиции на оригинальном изображении
+
+    //и уже тут отрезать нужный кусок с битмапы (пример отрезает автобус в центре изображения)
+    bitmap = Bitmap.createBitmap(
+        bitmap,
+        1100,
+        1300,
+        400,
+        300
+    );
+
+    return bitmap;
   }
 
   private void setPointPos(CropPoint cropPoint, int x, int y) {
@@ -276,5 +285,4 @@ public class CropView extends View {
     }
     return false;
   }
-
 }
