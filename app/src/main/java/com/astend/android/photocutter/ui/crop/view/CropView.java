@@ -16,8 +16,9 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
+import com.astend.android.photocutter.R;
+
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -28,13 +29,10 @@ public class CropView extends View {
   private final int intersectionPadding = 75;
 
   private RectF rect = new RectF(100, 100, 200, 200);
-  private Rect srcImgRect = new Rect(0, 0, 200, 200);
   private Rect dstImgRect = new Rect(0, 0, 200, 200);
   private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-  private Paint bitmapPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-  boolean isSize;
-
+  public File croppedFile;
 
   /**
    * -1 не выбрана не одна точка<br>
@@ -43,7 +41,6 @@ public class CropView extends View {
   private int cropPointActivated = -1;
 
   private CropPoint[] cropPoints = new CropPoint[4];
-  //private Bitmap bitmap = null;
 
   public CropView(Context context) {
     super(context);
@@ -139,7 +136,6 @@ public class CropView extends View {
     rect = new RectF(spacingVertical, spacingHorizontal, w - spacingVertical, h - spacingHorizontal);
 
 
-
     CropPoint topLeft = new CropPoint();
     CropPoint topRight = new CropPoint();
     CropPoint bottomRight = new CropPoint();
@@ -190,7 +186,7 @@ public class CropView extends View {
 
     if (yTopPx < 0)
       yTopPx = 0;
-    if  (imgSrcHeight < yBottomPx)
+    if (imgSrcHeight < yBottomPx)
       yBottomPx = imgSrcHeight;
     if (xLeftPx < 0)
       xLeftPx = 0;
@@ -204,30 +200,50 @@ public class CropView extends View {
         (int) (xRightPx - xLeftPx),
         (int) (yBottomPx - yTopPx)
     );
-//      File file1 = new File("");
-//     String state =  Environment.getExternalStorageState();
-//     if (state == Environment.MEDIA_MOUNTED){
-//       file1 =  getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-//     }
-//     file1 = new File(file1,"asd.jpg");
-//    try {
-//      file1.createNewFile();
-//    } catch (IOException e) {
-//      e.printStackTrace();
-//    }
-//    try {
-//      FileOutputStream fileOutputStream = new FileOutputStream(file1);
-//      bitmap.compress(Bitmap.CompressFormat.JPEG,95,fileOutputStream);
-//      fileOutputStream.close();
-//    } catch (FileNotFoundException e) {
-//      e.printStackTrace();
-//    } catch (IOException e) {
-//      e.printStackTrace();
-//    }
 
+    croppedFile = saveBitmap(bitmap);
 
     return bitmap;
   }
+
+  private File saveBitmap(Bitmap bitmap) {
+    File file = getContext().getCacheDir();
+
+    String state = Environment.getExternalStorageState();
+
+    if (state == Environment.MEDIA_MOUNTED)
+      file = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+
+    file = new File(file, getContext().getString(R.string.prefix_file_name) + "_" + System.currentTimeMillis() + ".jpg");
+
+    try {
+      boolean isCreated = file.createNewFile();
+      if (!isCreated) {
+        file = getContext().getCacheDir();
+        file.createNewFile();
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+      file = getContext().getCacheDir();
+      try {
+        file.createNewFile();
+      } catch (IOException ioException) {
+        ioException.printStackTrace();
+      }
+    }
+
+    try {
+      FileOutputStream fileOutputStream = new FileOutputStream(file);
+      bitmap.compress(Bitmap.CompressFormat.JPEG, 95, fileOutputStream);
+      fileOutputStream.close();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    return file;
+
+  }
+
 
   private void setPointPos(CropPoint cropPoint, int x, int y) {
     cropPoint.setRadiusSize(cropPointNormalRadiusSize);
@@ -346,5 +362,9 @@ public class CropView extends View {
       return true;
     }
     return false;
+  }
+
+  public File getCroppedFile() {
+    return croppedFile;
   }
 }

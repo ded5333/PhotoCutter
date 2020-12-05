@@ -1,9 +1,6 @@
 package com.astend.android.photocutter.ui.crop;
 
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,19 +16,28 @@ import androidx.navigation.Navigation;
 import com.astend.android.photocutter.BuildConfig;
 import com.astend.android.photocutter.R;
 import com.astend.android.photocutter.ui.crop.view.CropView;
-import com.astend.android.photocutter.ui.finish.FinishFragment;
 import com.astend.android.photocutter.utils.ExtendedImageView;
 
 public class CropFragment extends Fragment {
 
   public static final String PHOTO_PATH = "photoPath";
   Bitmap bitmap;
+  String photoPath = "test";
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
 
     return inflater.inflate(R.layout.fragment_crop, container, false);
+  }
+
+  @Override
+  public void onCreate(@Nullable Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    if (getArguments() != null){
+      photoPath = getArguments().getString(CropFragment.PHOTO_PATH);
+    }
+
   }
 
   @Override
@@ -50,7 +56,7 @@ public class CropFragment extends Fragment {
       textOk.setVisibility(View.VISIBLE);
       textCancel.setVisibility(View.VISIBLE);
 
-       bitmap = cropView.cropBitmap(
+      bitmap = cropView.cropBitmap(
           imageView.getBitmap(),
           imageView.getImgSrcWidth(),
           imageView.getImgSrcHeight(),
@@ -70,7 +76,6 @@ public class CropFragment extends Fragment {
       cropView.setVisibility(View.VISIBLE);
 
       if (BuildConfig.FLAVOR.equalsIgnoreCase("full")) {
-        String photoPath = getArguments().getString(CropFragment.PHOTO_PATH);
         imageView.setImage(photoPath);
       }
       else
@@ -79,17 +84,13 @@ public class CropFragment extends Fragment {
     });
 
     textOk.setOnClickListener(v -> {
-      Navigation.findNavController(view).navigate(R.id.action_cropFragment_to_finishFragment);
-       bitmap = cropView.cropBitmap(
-          imageView.getBitmap(),
-          imageView.getImgSrcWidth(),
-          imageView.getImgSrcHeight(),
-          imageView.getInnerBitmapWidth(),
-          imageView.getInnerBitmapHeight()
+      Bundle bundle = new Bundle();
+      bundle.putString(PHOTO_PATH, cropView.getCroppedFile().getAbsolutePath());
+
+      Navigation.findNavController(view).navigate(
+          R.id.action_cropFragment_to_finishFragment,
+          bundle
       );
-      Intent intent = new Intent(getActivity(),FinishFragment.class);
-     intent.putExtra("BitmapImage", bitmap);
-      startActivity(intent);
 
 
     });
