@@ -2,17 +2,24 @@ package com.astend.android.photocutter.ui.crop.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Environment;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.Nullable;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class CropView extends View {
 
@@ -131,6 +138,8 @@ public class CropView extends View {
 
     rect = new RectF(spacingVertical, spacingHorizontal, w - spacingVertical, h - spacingHorizontal);
 
+
+
     CropPoint topLeft = new CropPoint();
     CropPoint topRight = new CropPoint();
     CropPoint bottomRight = new CropPoint();
@@ -148,21 +157,74 @@ public class CropView extends View {
   }
 
   public Bitmap cropBitmap(Bitmap bitmap,
-                         int imgSrcWidth,
-                         int imgSrcHeight,
-                         float widthAspectRatio,
-                         float heightAspectRatio) {
+                           int imgSrcWidth,
+                           int imgSrcHeight,
+                           int imgInnerWidth,
+                           int imgInnerHeight) {
     Log.d("TAG", "rect: " + rect.toString());
-    //тут наверное нужно перемножить позиции квадрата на aspectRatio и получится узнать позиции на оригинальном изображении
+    float percentInnerWidth = imgInnerWidth / 100f;
+    float xPercentLeft = (cropPoints[0].getX() - ((getWidth() - imgInnerWidth) / 2f)) / percentInnerWidth;
+    float percentSrcWidth = imgSrcWidth / 100f;
+    float xLeftPx = percentSrcWidth * xPercentLeft;
 
-    //и уже тут отрезать нужный кусок с битмапы (пример отрезает автобус в центре изображения)
+    float percentInnerHeight = imgInnerHeight / 100f;
+    float yPercentTop = (cropPoints[0].getY() - ((getHeight() - imgInnerHeight) / 2f)) / percentInnerHeight;
+    float percentSrcHeight = imgSrcHeight / 100f;
+    float yTopPx = percentSrcHeight * yPercentTop;
+
+    float xPercentRight = (cropPoints[2].getX() - ((getWidth() - imgInnerWidth) / 2f)) / percentInnerWidth;
+    float xRightPx = percentSrcWidth * xPercentRight;
+    float yPercentBottom = (cropPoints[2].getY() - ((getHeight() - imgInnerHeight) / 2f)) / percentInnerHeight;
+    float yBottomPx = percentSrcHeight * yPercentBottom;
+
+
+    Log.d("TAG", "xLeftPx: " + xLeftPx + " x " + yTopPx);
+//    Log.d("TAG", "cropPoints[0].getY() - ((getHeight() - imgInnerHeight) / 2f))/percentInnerHeight   ---"
+//        + cropPoints[0].getY() + " - ((" +  getHeight() + " - " + imgInnerHeight + " /2))" + "/" +  percentInnerHeight );
+
+    Log.d("TAG", " " + xRightPx + " x " + yBottomPx);
+    String testFileName = "derevo.jpg";
+    File file = new File(getContext().getCacheDir(), testFileName);
+
+    bitmap = BitmapFactory.decodeFile(file.toString());
+
+    if (yTopPx < 0)
+      yTopPx = 0;
+    if  (imgSrcHeight < yBottomPx)
+      yBottomPx = imgSrcHeight;
+    if (xLeftPx < 0)
+      xLeftPx = 0;
+    if (imgSrcWidth < xRightPx)
+      xRightPx = imgSrcWidth;
+
     bitmap = Bitmap.createBitmap(
         bitmap,
-        1100,
-        1300,
-        400,
-        300
+        (int) xLeftPx,
+        (int) yTopPx,
+        (int) (xRightPx - xLeftPx),
+        (int) (yBottomPx - yTopPx)
     );
+//      File file1 = new File("");
+//     String state =  Environment.getExternalStorageState();
+//     if (state == Environment.MEDIA_MOUNTED){
+//       file1 =  getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+//     }
+//     file1 = new File(file1,"asd.jpg");
+//    try {
+//      file1.createNewFile();
+//    } catch (IOException e) {
+//      e.printStackTrace();
+//    }
+//    try {
+//      FileOutputStream fileOutputStream = new FileOutputStream(file1);
+//      bitmap.compress(Bitmap.CompressFormat.JPEG,95,fileOutputStream);
+//      fileOutputStream.close();
+//    } catch (FileNotFoundException e) {
+//      e.printStackTrace();
+//    } catch (IOException e) {
+//      e.printStackTrace();
+//    }
+
 
     return bitmap;
   }

@@ -1,6 +1,8 @@
 package com.astend.android.photocutter.ui.finish;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +25,7 @@ public class FinishFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         return inflater.inflate(R.layout.fragment_finish, container, false);
+
     }
 
     @Override
@@ -31,6 +34,19 @@ public class FinishFragment extends Fragment {
         ImageView ivSend = view.findViewById(R.id.ivSend);
         ImageView ivGallery = view.findViewById(R.id.ivGallery);
         Button btnMenu = view.findViewById(R.id.btnMenu);
+        ImageView imageView = view.findViewById(R.id.ivFinish);
+
+
+
+            Intent intentView = getActivity().getIntent();
+            Bitmap bitmap = (Bitmap) intentView.getParcelableExtra("BitmapImage");
+            imageView.setImageBitmap(bitmap);
+
+
+
+
+
+
 
         ivGallery.setImageResource(R.drawable.gallery);
         ivSend.setImageResource(R.drawable.pngwing);

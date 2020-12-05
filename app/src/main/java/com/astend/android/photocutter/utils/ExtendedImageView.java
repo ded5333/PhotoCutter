@@ -3,6 +3,7 @@ package com.astend.android.photocutter.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 
@@ -10,6 +11,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 public class ExtendedImageView extends AppCompatImageView {
 
@@ -17,8 +21,6 @@ public class ExtendedImageView extends AppCompatImageView {
   private int imgSrcWidth = 0;
   private int innerBitmapWidth = 0;
   private int innerBitmapHeight = 0;
-  private float widthAspectRatio = 0;
-  private float heightAspectRatio = 0;
   private String imagePath = null;
   private boolean isSizeSetup = false;
   private Bitmap bitmap;
@@ -65,18 +67,20 @@ public class ExtendedImageView extends AppCompatImageView {
   //ToDo вынести в отдельный поток
   private void loadImageBitmap() {
     BitmapFactory.Options options = new BitmapFactory.Options();
-    options.inJustDecodeBounds = true;
+     options.inJustDecodeBounds = true;
 
     if (imagePath.equals("test")) {
-      String testFileName = "img6000x4000.jpg"; //"img1800x1200.jpg"
-      File file  = new File(getContext().getCacheDir(), testFileName);
+    //  String testFileName = "ic_launcher.png";
+    //  String testFileName = "img6000x4000.jpg";
+      String testFileName = "derevo.jpg";
+      File file = new File(getContext().getCacheDir(), testFileName);
 
       if (!file.exists())
-        Utils.copyFileFromAssets(getContext(), "img6000x4000.jpg", file);
+        Utils.copyFileFromAssets(getContext(), testFileName, file);
+
 
       BitmapFactory.decodeFile(file.getAbsolutePath(), options);
       loadSampleSize(options);
-
       bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
     }
     else {
@@ -110,7 +114,8 @@ public class ExtendedImageView extends AppCompatImageView {
 
   private void calculateInnerBitmapSize(int sampleBitmapWidth, int sampleBitmapHeight) {
     //тут нужно высчитать размер отрисованого битмапа
-    if (getWidth() > getHeight()) {
+
+    if (sampleBitmapWidth > sampleBitmapHeight) {
       //если длина больше высоты
 
       // шото типа sampleBitmapWidth / 100 это 1 процент загруженого изображения
@@ -118,21 +123,33 @@ public class ExtendedImageView extends AppCompatImageView {
       // тут нужно просчитать на сколько процентов сжалось изображение по длине
       // и узнать на сколько сжалось по высоте
       // и перевести в пиксели и присвоить значения в переменные:
-      innerBitmapWidth = 0;
-      innerBitmapHeight = 0;
+
+      float onePercentBitmapWidth = sampleBitmapWidth/100f;
+      float innerPercentWidth =  getWidth()/onePercentBitmapWidth;
+      float onePercentBitmapHeight = sampleBitmapHeight/100f;
+      float def = onePercentBitmapHeight * innerPercentWidth;
+
+      Log.d("TAG" ," def " + def  + " innerPerWidth" + " " + innerPercentWidth);
+
+
+      innerBitmapWidth = getWidth();
+      innerBitmapHeight = (int) def;
     }
     else {
       //в другом случае  высота равно длине или высота больше длины
+      float onePercentBitmapHeight = sampleBitmapHeight/100f;
+      float innerPercentHeight = getHeight()/onePercentBitmapHeight;
+      float onePercentBitmapWidth = sampleBitmapWidth/100f;
+      float def = innerPercentHeight * onePercentBitmapWidth;
 
-      innerBitmapWidth = 0;
-      innerBitmapHeight = 0;
+      innerBitmapWidth = (int) def;
+      innerBitmapHeight = getHeight();
     }
 
     Log.d("TAG", "Тут нужно сделать расчет соотношения исходного изображения и " +
         "внутреннего (отрисованого) bitmap");
 
-    this.widthAspectRatio = (float) imgSrcWidth / innerBitmapWidth;
-    this.heightAspectRatio = (float) imgSrcHeight / innerBitmapHeight;
+
 
     //зная соотношения, можно будет высчитывать обрезку
   }
@@ -145,12 +162,12 @@ public class ExtendedImageView extends AppCompatImageView {
     return imgSrcWidth;
   }
 
-  public float getWidthAspectRatio() {
-    return widthAspectRatio;
+  public int getInnerBitmapWidth() {
+    return innerBitmapWidth;
   }
 
-  public float getHeightAspectRatio() {
-    return heightAspectRatio;
+  public int getInnerBitmapHeight() {
+    return innerBitmapHeight;
   }
 
   public Bitmap getBitmap() {

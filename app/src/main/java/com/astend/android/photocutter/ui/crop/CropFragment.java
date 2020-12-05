@@ -1,6 +1,9 @@
 package com.astend.android.photocutter.ui.crop;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,11 +19,13 @@ import androidx.navigation.Navigation;
 import com.astend.android.photocutter.BuildConfig;
 import com.astend.android.photocutter.R;
 import com.astend.android.photocutter.ui.crop.view.CropView;
+import com.astend.android.photocutter.ui.finish.FinishFragment;
 import com.astend.android.photocutter.utils.ExtendedImageView;
 
 public class CropFragment extends Fragment {
 
   public static final String PHOTO_PATH = "photoPath";
+  Bitmap bitmap;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -39,18 +44,21 @@ public class CropFragment extends Fragment {
     CropView cropView = view.findViewById(R.id.imagePhoto);
     ExtendedImageView imageView = view.findViewById(R.id.imageView);
 
+
     btnCrop.setOnClickListener(v -> {
       btnCrop.setEnabled(false);
       textOk.setVisibility(View.VISIBLE);
       textCancel.setVisibility(View.VISIBLE);
 
-      Bitmap bitmap = cropView.cropBitmap(
+       bitmap = cropView.cropBitmap(
           imageView.getBitmap(),
           imageView.getImgSrcWidth(),
           imageView.getImgSrcHeight(),
-          imageView.getWidthAspectRatio(),
-          imageView.getHeightAspectRatio()
+          imageView.getInnerBitmapWidth(),
+          imageView.getInnerBitmapHeight()
       );
+
+      cropView.setVisibility(View.INVISIBLE);
 
       imageView.setImageBitmap(bitmap);
     });
@@ -59,11 +67,31 @@ public class CropFragment extends Fragment {
       btnCrop.setEnabled(true);
       textOk.setVisibility(View.INVISIBLE);
       textCancel.setVisibility(View.INVISIBLE);
+      cropView.setVisibility(View.VISIBLE);
+
+      if (BuildConfig.FLAVOR.equalsIgnoreCase("full")) {
+        String photoPath = getArguments().getString(CropFragment.PHOTO_PATH);
+        imageView.setImage(photoPath);
+      }
+      else
+        imageView.setImage("test");
 
     });
 
     textOk.setOnClickListener(v -> {
       Navigation.findNavController(view).navigate(R.id.action_cropFragment_to_finishFragment);
+       bitmap = cropView.cropBitmap(
+          imageView.getBitmap(),
+          imageView.getImgSrcWidth(),
+          imageView.getImgSrcHeight(),
+          imageView.getInnerBitmapWidth(),
+          imageView.getInnerBitmapHeight()
+      );
+      Intent intent = new Intent(getActivity(),FinishFragment.class);
+     intent.putExtra("BitmapImage", bitmap);
+      startActivity(intent);
+
+
     });
 
     if (BuildConfig.FLAVOR.equalsIgnoreCase("full")) {
