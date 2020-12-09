@@ -3,7 +3,6 @@ package com.astend.android.photocutter.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 
@@ -11,9 +10,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 
 public class ExtendedImageView extends AppCompatImageView {
 
@@ -24,6 +20,9 @@ public class ExtendedImageView extends AppCompatImageView {
   private String imagePath = null;
   private boolean isSizeSetup = false;
   private Bitmap bitmap;
+  public static String file;
+
+
 
   public ExtendedImageView(Context context) {
     super(context);
@@ -87,6 +86,7 @@ public class ExtendedImageView extends AppCompatImageView {
       BitmapFactory.decodeFile(imagePath, options);
       loadSampleSize(options);
       bitmap = BitmapFactory.decodeFile(imagePath, options);
+      file = imagePath;
     }
 
     Log.d("TAG", "Simple bitmap size: " + bitmap.getWidth() + " " + bitmap.getHeight());

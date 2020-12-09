@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import com.astend.android.photocutter.R;
 import com.astend.android.photocutter.ui.crop.CropFragment;
@@ -64,5 +65,8 @@ public class FinishFragment extends Fragment {
     });
 
 
+      btnMenu.setOnClickListener(v -> {
+        Navigation.findNavController(view).navigate(R.id.action_finishFragment_to_splashFragment);
+      });
   }
 }

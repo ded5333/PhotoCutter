@@ -46,5 +46,9 @@
         android:id="@+id/finishFragment"
         android:name="com.astend.android.photocutter.ui.finish.FinishFragment"
         android:label="fragment_finish"
-        tools:layout="@layout/fragment_finish" />
+        tools:layout="@layout/fragment_finish" >
+        <action
+            android:id="@+id/action_finishFragment_to_splashFragment"
+            app:destination="@id/splashFragment" />
+    </fragment>
 </navigation>

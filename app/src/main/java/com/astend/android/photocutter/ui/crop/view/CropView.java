@@ -17,16 +17,19 @@ import android.view.View;
 import androidx.annotation.Nullable;
 
 import com.astend.android.photocutter.R;
+import com.astend.android.photocutter.utils.ExtendedImageView;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 public class CropView extends View {
 
   private final int cropPointActivatedRadiusSize = 25;
   private final int cropPointNormalRadiusSize = 15;
-  private final int intersectionPadding = 75;
+  private final int intersectionPadding = 100;
 
   private RectF rect = new RectF(100, 100, 200, 200);
   private Rect dstImgRect = new Rect(0, 0, 200, 200);
@@ -180,9 +183,16 @@ public class CropView extends View {
 
     Log.d("TAG", " " + xRightPx + " x " + yBottomPx);
     String testFileName = "derevo.jpg";
-    File file = new File(getContext().getCacheDir(), testFileName);
+    String filee = ExtendedImageView.file;
+    File file = new File(getContext().getCacheDir(), filee);
 
-    bitmap = BitmapFactory.decodeFile(file.toString());
+    try {
+      bitmap = BitmapFactory.decodeStream((InputStream)new URL(filee).getContent());
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    //  bitmap = BitmapFactory.decodeFile(file.toString());
 
     if (yTopPx < 0)
       yTopPx = 0;

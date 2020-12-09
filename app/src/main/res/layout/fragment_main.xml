@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#AF81F1"
     tools:context=".ui.main.MainFragment">
 
     <Button
@@ -13,6 +14,7 @@
         android:layout_marginBottom="228dp"
         android:text="Камера"
         android:textSize="24sp"
+        android:background="@drawable/button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.504"
@@ -24,7 +26,7 @@
         android:layout_height="wrap_content"
         android:text="Галерея"
         android:textSize="24sp"
-
+        android:background="@drawable/button"
         app:layout_constraintBottom_toTopOf="@+id/btnCamera"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

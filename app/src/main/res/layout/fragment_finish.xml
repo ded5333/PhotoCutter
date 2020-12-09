@@ -4,6 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#AF81F1"
+
     tools:context=".ui.finish.FinishFragment">
 
     <View
@@ -67,6 +69,7 @@
         android:id="@+id/ivFinish"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:scaleType="centerInside"
         app:layout_constraintBottom_toTopOf="@+id/textView18"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
