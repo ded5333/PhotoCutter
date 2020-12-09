@@ -13,17 +13,15 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
 import com.astend.android.photocutter.R;
-import com.astend.android.photocutter.utils.ExtendedImageView;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 
 public class CropView extends View {
 
@@ -35,7 +33,7 @@ public class CropView extends View {
   private Rect dstImgRect = new Rect(0, 0, 200, 200);
   private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-  public File croppedFile;
+  public File croppedFile = null;
 
   /**
    * -1 не выбрана не одна точка<br>
@@ -156,10 +154,15 @@ public class CropView extends View {
   }
 
   public Bitmap cropBitmap(Bitmap bitmap,
+                           String imgPath,
                            int imgSrcWidth,
                            int imgSrcHeight,
                            int imgInnerWidth,
                            int imgInnerHeight) {
+
+    // освобождаем память bitmap
+    bitmap.recycle();
+
     Log.d("TAG", "rect: " + rect.toString());
     float percentInnerWidth = imgInnerWidth / 100f;
     float xPercentLeft = (cropPoints[0].getX() - ((getWidth() - imgInnerWidth) / 2f)) / percentInnerWidth;
@@ -182,17 +185,7 @@ public class CropView extends View {
 //        + cropPoints[0].getY() + " - ((" +  getHeight() + " - " + imgInnerHeight + " /2))" + "/" +  percentInnerHeight );
 
     Log.d("TAG", " " + xRightPx + " x " + yBottomPx);
-    String testFileName = "derevo.jpg";
-    String filee = ExtendedImageView.file;
-    File file = new File(getContext().getCacheDir(), filee);
 
-    try {
-      bitmap = BitmapFactory.decodeStream((InputStream)new URL(filee).getContent());
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-    //  bitmap = BitmapFactory.decodeFile(file.toString());
 
     if (yTopPx < 0)
       yTopPx = 0;
@@ -203,15 +196,25 @@ public class CropView extends View {
     if (imgSrcWidth < xRightPx)
       xRightPx = imgSrcWidth;
 
-    bitmap = Bitmap.createBitmap(
-        bitmap,
-        (int) xLeftPx,
-        (int) yTopPx,
-        (int) (xRightPx - xLeftPx),
-        (int) (yBottomPx - yTopPx)
-    );
+    try {
+      bitmap = BitmapFactory.decodeFile(imgPath);
 
-    croppedFile = saveBitmap(bitmap);
+      bitmap = Bitmap.createBitmap(
+          bitmap,
+          (int) xLeftPx,
+          (int) yTopPx,
+          (int) (xRightPx - xLeftPx),
+          (int) (yBottomPx - yTopPx)
+      );
+
+      croppedFile = saveBitmap(bitmap);
+    } catch (Exception e) {
+      e.printStackTrace();
+      croppedFile = null;
+      //todo перевести в диалоговое окно
+      Toast.makeText(getContext(),getContext().getString(R.string.out_off_memory),Toast.LENGTH_LONG).show();
+    }
+
 
     return bitmap;
   }

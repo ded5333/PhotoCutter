@@ -20,8 +20,6 @@ public class ExtendedImageView extends AppCompatImageView {
   private String imagePath = null;
   private boolean isSizeSetup = false;
   private Bitmap bitmap;
-  public static String file;
-
 
 
   public ExtendedImageView(Context context) {
@@ -66,11 +64,11 @@ public class ExtendedImageView extends AppCompatImageView {
   //ToDo вынести в отдельный поток
   private void loadImageBitmap() {
     BitmapFactory.Options options = new BitmapFactory.Options();
-     options.inJustDecodeBounds = true;
+    //  options.inJustDecodeBounds = true;
 
     if (imagePath.equals("test")) {
-    //  String testFileName = "ic_launcher.png";
-    //  String testFileName = "img6000x4000.jpg";
+      //  String testFileName = "ic_launcher.png";
+      //  String testFileName = "img6000x4000.jpg";
       String testFileName = "derevo.jpg";
       File file = new File(getContext().getCacheDir(), testFileName);
 
@@ -81,12 +79,13 @@ public class ExtendedImageView extends AppCompatImageView {
       BitmapFactory.decodeFile(file.getAbsolutePath(), options);
       loadSampleSize(options);
       bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+
     }
     else {
       BitmapFactory.decodeFile(imagePath, options);
       loadSampleSize(options);
       bitmap = BitmapFactory.decodeFile(imagePath, options);
-      file = imagePath;
+
     }
 
     Log.d("TAG", "Simple bitmap size: " + bitmap.getWidth() + " " + bitmap.getHeight());
@@ -124,12 +123,12 @@ public class ExtendedImageView extends AppCompatImageView {
       // и узнать на сколько сжалось по высоте
       // и перевести в пиксели и присвоить значения в переменные:
 
-      float onePercentBitmapWidth = sampleBitmapWidth/100f;
-      float innerPercentWidth =  getWidth()/onePercentBitmapWidth;
-      float onePercentBitmapHeight = sampleBitmapHeight/100f;
+      float onePercentBitmapWidth = sampleBitmapWidth / 100f;
+      float innerPercentWidth = getWidth() / onePercentBitmapWidth;
+      float onePercentBitmapHeight = sampleBitmapHeight / 100f;
       float def = onePercentBitmapHeight * innerPercentWidth;
 
-      Log.d("TAG" ," def " + def  + " innerPerWidth" + " " + innerPercentWidth);
+      Log.d("TAG", " def " + def + " innerPerWidth" + " " + innerPercentWidth);
 
 
       innerBitmapWidth = getWidth();
@@ -137,9 +136,9 @@ public class ExtendedImageView extends AppCompatImageView {
     }
     else {
       //в другом случае  высота равно длине или высота больше длины
-      float onePercentBitmapHeight = sampleBitmapHeight/100f;
-      float innerPercentHeight = getHeight()/onePercentBitmapHeight;
-      float onePercentBitmapWidth = sampleBitmapWidth/100f;
+      float onePercentBitmapHeight = sampleBitmapHeight / 100f;
+      float innerPercentHeight = getHeight() / onePercentBitmapHeight;
+      float onePercentBitmapWidth = sampleBitmapWidth / 100f;
       float def = innerPercentHeight * onePercentBitmapWidth;
 
       innerBitmapWidth = (int) def;
@@ -148,7 +147,6 @@ public class ExtendedImageView extends AppCompatImageView {
 
     Log.d("TAG", "Тут нужно сделать расчет соотношения исходного изображения и " +
         "внутреннего (отрисованого) bitmap");
-
 
 
     //зная соотношения, можно будет высчитывать обрезку
@@ -170,7 +168,10 @@ public class ExtendedImageView extends AppCompatImageView {
     return innerBitmapHeight;
   }
 
-  public Bitmap getBitmap() {
+  public String getFilePath() {
+    return imagePath;
+  }
+  public Bitmap getBitmap(){
     return bitmap;
   }
 }

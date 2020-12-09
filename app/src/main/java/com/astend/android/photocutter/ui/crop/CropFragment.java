@@ -21,8 +21,8 @@ import com.astend.android.photocutter.utils.ExtendedImageView;
 public class CropFragment extends Fragment {
 
   public static final String PHOTO_PATH = "photoPath";
-  Bitmap bitmap;
-  String photoPath = "test";
+  private Bitmap bitmap;
+  private String photoPath = "test";
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -58,6 +58,7 @@ public class CropFragment extends Fragment {
 
       bitmap = cropView.cropBitmap(
           imageView.getBitmap(),
+          imageView.getFilePath(),
           imageView.getImgSrcWidth(),
           imageView.getImgSrcHeight(),
           imageView.getInnerBitmapWidth(),
