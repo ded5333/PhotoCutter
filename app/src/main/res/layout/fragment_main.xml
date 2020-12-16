@@ -9,26 +9,28 @@
 
     <Button
         android:id="@+id/btnCamera"
+        style="@style/MyStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="228dp"
+        android:drawableEnd="@drawable/ic_baseline_monochrome_photos_24"
         android:text="Камера"
-        android:textSize="24sp"
-        android:background="@drawable/button"
+        android:textSize="28sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.504"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/btnGallery"
+        style="@style/MyStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:drawableEnd="@drawable/ic_baseline_insert_photo_24"
         android:text="Галерея"
-        android:textSize="24sp"
-        android:background="@drawable/button"
+        android:textSize="28sp"
         app:layout_constraintBottom_toTopOf="@+id/btnCamera"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

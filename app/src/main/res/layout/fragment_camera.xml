@@ -10,14 +10,13 @@
         android:id="@+id/camera_capture_button"
         android:layout_width="90dp"
         android:layout_height="90dp"
-        android:scaleType="fitCenter"
+        style="@style/ButtonCut"
         android:text="Take Photo"
-        android:background="@color/colorAccent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginBottom="20dp"
-        android:elevation="2dp" />
+         />
 
     <androidx.camera.view.PreviewView
         android:id="@+id/viewFinder"
