@@ -1,0 +1,20 @@
+android{
+    flavorDimensions "version"
+    productFlavors{
+        demo{
+            versionNameSuffix " MyDemo"
+        }
+        full{
+            //  versionNameSuffix "Full"
+            signingConfigs {
+                signed {
+                    storeFile file("../key/key.jks")
+                    storePassword "57X2hmK7eG"
+                    keyAlias "PhotoCutter"
+                    keyPassword "pUn7iJ892X"
+                }
+            }
+        }
+
+    }
+}
