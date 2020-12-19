@@ -28,6 +28,8 @@ public class CropView extends View {
   private final int cropPointActivatedRadiusSize = 25;
   private final int cropPointNormalRadiusSize = 15;
   private final int intersectionPadding = 100;
+  private final int cropPointPadding = 50;
+
 
   private RectF rect = new RectF(100, 100, 200, 200);
   private Rect dstImgRect = new Rect(0, 0, 200, 200);
@@ -212,7 +214,7 @@ public class CropView extends View {
       e.printStackTrace();
       croppedFile = null;
       //todo перевести в диалоговое окно
-      Toast.makeText(getContext(),getContext().getString(R.string.out_off_memory),Toast.LENGTH_LONG).show();
+      Toast.makeText(getContext(), getContext().getString(R.string.out_off_memory), Toast.LENGTH_LONG).show();
     }
 
 
@@ -344,8 +346,8 @@ public class CropView extends View {
 
   private boolean findCropPoint(float x, float y) {
     for (int i = 0; i < cropPoints.length; ++i) {
-      if (cropPoints[i].getLeft() < x && cropPoints[i].getRight() > x
-          && cropPoints[i].getTop() < y && cropPoints[i].getBottom() > y) {
+      if (cropPoints[i].getLeft() - cropPointPadding < x && cropPoints[i].getRight() + cropPointPadding > x
+          && cropPoints[i].getTop() - cropPointPadding < y && cropPoints[i].getBottom() + cropPointPadding > y) {
         cropPointActivated = i;
         return true;
       }
