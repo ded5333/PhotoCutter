@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -20,6 +21,7 @@ import androidx.annotation.Nullable;
 import com.astend.android.photocutter.R;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -263,7 +265,16 @@ public class CropView extends View {
     } catch (Exception e) {
       e.printStackTrace();
     }
-
+    try {
+      MediaStore.Images.Media.insertImage(getContext().getContentResolver(),file.getAbsolutePath(),file.getName(),"");
+//      MediaScannerConnection.scanFile(
+//          getContext(),
+//          new String[]{file.toString()},
+//          null,
+//          (path, uri) -> Log.d("TAG", "onScanCompleted: " + path));
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
     return file;
 
   }
