@@ -24,6 +24,9 @@
         <action
             android:id="@+id/action_mainFragment_to_cameraFragment"
             app:destination="@id/cameraFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_cropFragment"
+            app:destination="@id/cropFragment" />
     </fragment>
     <fragment
         android:id="@+id/cameraFragment"

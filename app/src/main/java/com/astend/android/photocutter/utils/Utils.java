@@ -2,6 +2,7 @@ package com.astend.android.photocutter.utils;
 
 import android.content.Context;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -53,7 +54,28 @@ public class Utils {
       }
     }
   }
+  public static void copyFileByUri(Context context, Uri uriFile, File destFile) {
+    InputStream inputStream = null;
+    OutputStream outputStream = null;
 
+    try {
+      if (!destFile.exists()) {
+
+        inputStream = context.getContentResolver().openInputStream(uriFile);
+        outputStream = new FileOutputStream(destFile);
+        copyFile(inputStream, outputStream);
+      }
+    } catch (IOException ex) {
+      ex.printStackTrace();
+    } finally {
+      try {
+        inputStream.close();
+        outputStream.close();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+  }
   private static void copyFile(InputStream input, OutputStream output) throws IOException {
     byte[] buffer = new byte[1024];
     int read = input.read(buffer);

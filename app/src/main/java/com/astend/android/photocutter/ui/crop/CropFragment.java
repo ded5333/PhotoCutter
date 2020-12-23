@@ -88,6 +88,7 @@ public class CropFragment extends Fragment {
       Bundle bundle = new Bundle();
       bundle.putString(PHOTO_PATH, cropView.getCroppedFile().getAbsolutePath());
 
+
       Navigation.findNavController(view).navigate(
           R.id.action_cropFragment_to_finishFragment,
           bundle
