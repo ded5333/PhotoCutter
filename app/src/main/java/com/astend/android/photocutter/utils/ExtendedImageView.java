@@ -3,6 +3,7 @@ package com.astend.android.photocutter.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.ExifInterface;
 import android.util.AttributeSet;
 import android.util.Log;
 
@@ -10,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import java.io.File;
+import java.io.IOException;
 
 public class ExtendedImageView extends AppCompatImageView {
 
@@ -82,9 +84,30 @@ public class ExtendedImageView extends AppCompatImageView {
 
     }
     else {
+      int degree = 0;
+      try {
+        ExifInterface exifInterface = new ExifInterface(imagePath);
+        int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION,ExifInterface.ORIENTATION_NORMAL);
+        switch (orientation){
+          case ExifInterface.ORIENTATION_ROTATE_90:
+            degree = 90;
+            break;
+          case ExifInterface.ORIENTATION_ROTATE_180:
+            degree = 180;
+            break;
+          case ExifInterface.ORIENTATION_ROTATE_270:
+            degree = 270;
+            break;
+
+        }
+        setRotation(degree);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
       BitmapFactory.decodeFile(imagePath, options);
       loadSampleSize(options);
       bitmap = BitmapFactory.decodeFile(imagePath, options);
+
 
     }
 

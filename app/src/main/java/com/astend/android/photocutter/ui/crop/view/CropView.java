@@ -118,13 +118,20 @@ public class CropView extends View {
       canvas.drawBitmap(bitmap, srcImgRect, dstImgRect, bitmapPaint);*/
     canvas.drawRect(rect, paint);
 
+
+
+
+
+
     for (int i = 0; i < cropPoints.length; i++) {
       CropPoint point = cropPoints[i];
       if (cropPointActivated != -1 && i == cropPointActivated)
         canvas.drawCircle(point.getX(), point.getY(), cropPointActivatedRadiusSize, paint);
+
       else
         canvas.drawCircle(point.getX(), point.getY(), cropPointNormalRadiusSize, paint);
     }
+
   }
 
   @Override
@@ -221,10 +228,12 @@ public class CropView extends View {
     return bitmap;
   }
 
+
   private File saveBitmap(Bitmap bitmap) {
     File file = getContext().getCacheDir();
 
     String state = Environment.getExternalStorageState();
+
 
     if (state == Environment.MEDIA_MOUNTED)
       file = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);

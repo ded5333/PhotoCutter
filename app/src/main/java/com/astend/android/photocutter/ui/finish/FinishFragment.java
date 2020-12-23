@@ -23,6 +23,7 @@ public class FinishFragment extends Fragment {
   private final int GALLERY_REQUEST_CODE = 200;
   String photoPath;
 
+
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
