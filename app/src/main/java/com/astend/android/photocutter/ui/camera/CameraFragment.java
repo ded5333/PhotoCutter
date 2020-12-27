@@ -1,8 +1,6 @@
 package com.astend.android.photocutter.ui.camera;
 
 import android.Manifest;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -76,18 +74,9 @@ public class CameraFragment extends Fragment {
       startCamera();
     else
       requestPermissions(REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
-
-//        btnPhoto.setOnClickListener(v -> {
-    //    Navigation.findNavController(view).navigate(R.id.action_cameraFragment_to_cropFragment);
-//        });
-    // Set up the listener for take photo button
     btnPhoto.setOnClickListener(v -> {
       takePhoto();
-      //     Navigation.findNavController(view).navigate(R.id.action_cameraFragment_to_cropFragment);
-
     });
-
-
   }
 
   private void takePhoto() {
@@ -121,7 +110,6 @@ public class CameraFragment extends Fragment {
 
             Navigation.findNavController(CameraFragment.this.getView())
                 .navigate(R.id.action_cameraFragment_to_cropFragment, bundle);
-
 
           }
 
@@ -168,7 +156,6 @@ public class CameraFragment extends Fragment {
         requireContext(), REQUIRED_PERMISSIONS[0]) == PackageManager.PERMISSION_GRANTED;
   }
 
-
   @Override
   public void onDestroy() {
     super.onDestroy();
@@ -182,7 +169,8 @@ public class CameraFragment extends Fragment {
     if (requestCode == REQUEST_CODE_PERMISSIONS) {
       if (allPermissionsGranted()) {
         startCamera();
-      } else {
+      }
+      else {
 
         Toast.makeText(requireContext(),
             "Permissions not granted by the user.",

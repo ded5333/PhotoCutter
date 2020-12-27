@@ -66,7 +66,6 @@ public class CropFragment extends Fragment {
       );
 
       cropView.setVisibility(View.INVISIBLE);
-
       imageView.setImageBitmap(bitmap);
     });
 
@@ -88,12 +87,17 @@ public class CropFragment extends Fragment {
       Bundle bundle = new Bundle();
       bundle.putString(PHOTO_PATH, cropView.getCroppedFile().getAbsolutePath());
 
+//      MediaScannerConnection.scanFile(getContext(),
+//          new String[] { cropView.getCroppedFile().getAbsolutePath() }, null,
+//          (path, uri) -> {
+//            Log.i("ExternalStorage", "Scanned " + path + ":");
+//            Log.i("ExternalStorage", "-> uri=" + uri);
+//          });
 
       Navigation.findNavController(view).navigate(
           R.id.action_cropFragment_to_finishFragment,
           bundle
       );
-
 
     });
 

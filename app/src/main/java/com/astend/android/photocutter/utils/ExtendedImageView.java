@@ -59,29 +59,22 @@ public class ExtendedImageView extends AppCompatImageView {
 
     if (imagePath == null)
       return;
-
     loadImageBitmap();
   }
 
   //ToDo вынести в отдельный поток
   private void loadImageBitmap() {
     BitmapFactory.Options options = new BitmapFactory.Options();
-    //  options.inJustDecodeBounds = true;
-
     if (imagePath.equals("test")) {
-      //  String testFileName = "ic_launcher.png";
-      //  String testFileName = "img6000x4000.jpg";
       String testFileName = "derevo.jpg";
       File file = new File(getContext().getCacheDir(), testFileName);
 
       if (!file.exists())
         Utils.copyFileFromAssets(getContext(), testFileName, file);
 
-
       BitmapFactory.decodeFile(file.getAbsolutePath(), options);
       loadSampleSize(options);
       bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-
     }
     else {
       int degree = 0;
@@ -107,7 +100,6 @@ public class ExtendedImageView extends AppCompatImageView {
       BitmapFactory.decodeFile(imagePath, options);
       loadSampleSize(options);
       bitmap = BitmapFactory.decodeFile(imagePath, options);
-
 
     }
 
@@ -135,24 +127,14 @@ public class ExtendedImageView extends AppCompatImageView {
   }
 
   private void calculateInnerBitmapSize(int sampleBitmapWidth, int sampleBitmapHeight) {
-    //тут нужно высчитать размер отрисованого битмапа
 
     if (sampleBitmapWidth > sampleBitmapHeight) {
-      //если длина больше высоты
-
-      // шото типа sampleBitmapWidth / 100 это 1 процент загруженого изображения
-      // шото типа getWidth() / 100  это 1 процент размера вюшки
-      // тут нужно просчитать на сколько процентов сжалось изображение по длине
-      // и узнать на сколько сжалось по высоте
-      // и перевести в пиксели и присвоить значения в переменные:
-
       float onePercentBitmapWidth = sampleBitmapWidth / 100f;
       float innerPercentWidth = getWidth() / onePercentBitmapWidth;
       float onePercentBitmapHeight = sampleBitmapHeight / 100f;
       float def = onePercentBitmapHeight * innerPercentWidth;
 
       Log.d("TAG", " def " + def + " innerPerWidth" + " " + innerPercentWidth);
-
 
       innerBitmapWidth = getWidth();
       innerBitmapHeight = (int) def;
@@ -172,7 +154,6 @@ public class ExtendedImageView extends AppCompatImageView {
         "внутреннего (отрисованого) bitmap");
 
 
-    //зная соотношения, можно будет высчитывать обрезку
   }
 
   public int getImgSrcHeight() {

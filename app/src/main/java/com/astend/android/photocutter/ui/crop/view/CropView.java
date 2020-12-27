@@ -1,5 +1,6 @@
 package com.astend.android.photocutter.ui.crop.view;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,11 +15,11 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
 import com.astend.android.photocutter.R;
+import com.astend.android.photocutter.utils.Utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,7 +33,6 @@ public class CropView extends View {
   private final int intersectionPadding = 100;
   private final int cropPointPadding = 50;
 
-
   private RectF rect = new RectF(100, 100, 200, 200);
   private Rect dstImgRect = new Rect(0, 0, 200, 200);
   private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -44,7 +44,6 @@ public class CropView extends View {
    * в другом случае соотведствует индексу активной точки (cropPoint)
    */
   private int cropPointActivated = -1;
-
   private CropPoint[] cropPoints = new CropPoint[4];
 
   public CropView(Context context) {
@@ -121,10 +120,6 @@ public class CropView extends View {
     canvas.drawRect(rect, paint);
 
 
-
-
-
-
     for (int i = 0; i < cropPoints.length; i++) {
       CropPoint point = cropPoints[i];
       if (cropPointActivated != -1 && i == cropPointActivated)
@@ -146,7 +141,6 @@ public class CropView extends View {
     int spacingHorizontal = (int) ((w / 10f));
 
     rect = new RectF(spacingVertical, spacingHorizontal, w - spacingVertical, h - spacingHorizontal);
-
 
     CropPoint topLeft = new CropPoint();
     CropPoint topRight = new CropPoint();
@@ -192,11 +186,7 @@ public class CropView extends View {
 
 
     Log.d("TAG", "xLeftPx: " + xLeftPx + " x " + yTopPx);
-//    Log.d("TAG", "cropPoints[0].getY() - ((getHeight() - imgInnerHeight) / 2f))/percentInnerHeight   ---"
-//        + cropPoints[0].getY() + " - ((" +  getHeight() + " - " + imgInnerHeight + " /2))" + "/" +  percentInnerHeight );
-
     Log.d("TAG", " " + xRightPx + " x " + yBottomPx);
-
 
     if (yTopPx < 0)
       yTopPx = 0;
@@ -222,11 +212,12 @@ public class CropView extends View {
     } catch (Exception e) {
       e.printStackTrace();
       croppedFile = null;
-      //todo перевести в диалоговое окно
-      Toast.makeText(getContext(), getContext().getString(R.string.out_off_memory), Toast.LENGTH_LONG).show();
+
+      AlertDialog.Builder dialogOutOfMemory = new AlertDialog.Builder(getContext());
+      dialogOutOfMemory.setTitle("Важное Сообщение!")
+          .setMessage("Недостатоно памяти!")
+          .setPositiveButton("Ок", (dialog, which) -> dialog.cancel());
     }
-
-
     return bitmap;
   }
 
@@ -236,11 +227,10 @@ public class CropView extends View {
 
     String state = Environment.getExternalStorageState();
 
-
     if (state == Environment.MEDIA_MOUNTED)
-      file = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
-    file = new File(file, getContext().getString(R.string.prefix_file_name) + "_" + System.currentTimeMillis() + ".jpg");
+      file = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+      file = new File(file, getContext().getString(R.string.prefix_file_name) + "_" + System.currentTimeMillis() + ".jpg");
 
     try {
       boolean isCreated = file.createNewFile();
@@ -266,7 +256,8 @@ public class CropView extends View {
       e.printStackTrace();
     }
     try {
-      MediaStore.Images.Media.insertImage(getContext().getContentResolver(),file.getAbsolutePath(),file.getName(),"");
+      MediaStore.Images.Media.insertImage(getContext().getContentResolver(), file.getAbsolutePath(), file.getName(), "");
+      Utils.addImageToGallery(getContext(),file);
 //      MediaScannerConnection.scanFile(
 //          getContext(),
 //          new String[]{file.toString()},
@@ -330,10 +321,6 @@ public class CropView extends View {
       if (i == cropPointActivated) continue;
 
       CropPoint intersection = cropPoints[i];
-
-      /*Log.d("TAG", "[" + cropPoint.getLeft() + "," + intersection.getTop() + ", " + cropPoint.getRight() + ", " + cropPoint.getBottom() + "]" +
-          "   [" + intersection.getLeft() + "," + intersection.getTop() + ", " + intersection.getRight() + ", " + intersection.getBottom() + "]");*/
-
       if (isIntersectingRectangles(cropPoint, intersection)) {
         Log.d("TAG", "Пересекает " + cropPointActivated + " " + i);
         cropPoint.setPosition(saveXPos, saveYPos);

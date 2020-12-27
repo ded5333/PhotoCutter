@@ -1,6 +1,7 @@
 package com.astend.android.photocutter.utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 
@@ -54,6 +55,7 @@ public class Utils {
       }
     }
   }
+
   public static void copyFileByUri(Context context, Uri uriFile, File destFile) {
     InputStream inputStream = null;
     OutputStream outputStream = null;
@@ -76,6 +78,7 @@ public class Utils {
       }
     }
   }
+
   private static void copyFile(InputStream input, OutputStream output) throws IOException {
     byte[] buffer = new byte[1024];
     int read = input.read(buffer);
@@ -84,6 +87,13 @@ public class Utils {
       read = input.read(buffer);
     }
     output.flush();
+  }
+  public static void addImageToGallery(Context context,File file){
+    Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+//    File file = new File()
+    Uri uri = Uri.fromFile(file);
+    intent.setData(uri);
+    context.sendBroadcast(intent);
   }
 
 

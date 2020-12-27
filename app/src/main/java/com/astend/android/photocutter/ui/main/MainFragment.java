@@ -62,17 +62,17 @@ public class MainFragment extends Fragment {
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
     if (requestCode == GALLERY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-       file = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),new SimpleDateFormat(FILENAME_FORMAT, Locale.US)
-           .format(System.currentTimeMillis()) + ".jpg");
+       file = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+           new SimpleDateFormat(FILENAME_FORMAT,
+               Locale.US).format(System.currentTimeMillis()) + ".jpg");
       Utils.copyFileByUri(getContext(), data.getData(),file);
-      //Utils.copyFileByUri(getContext(), data.getData(), new File(getContext().getCacheDir(),   "/fileNmeTest.jpg"));
     }
     Bundle bundle = new Bundle();
     bundle.putString(CropFragment.PHOTO_PATH,file.toString());
     App.preferences.edit()
         .putString(CropFragment.PHOTO_PATH, file.toString())
         .apply();
-    Navigation.findNavController(MainFragment.this.getView())
+    Navigation.findNavController(getView())
         .navigate(R.id.action_mainFragment_to_cropFragment, bundle);
 
     Log.d("TAG", "requestcode: " + requestCode + "resultCode :" + resultCode);

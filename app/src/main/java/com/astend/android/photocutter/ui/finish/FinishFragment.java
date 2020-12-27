@@ -1,8 +1,10 @@
 package com.astend.android.photocutter.ui.finish;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +24,6 @@ import com.astend.android.photocutter.utils.ExtendedImageView;
 public class FinishFragment extends Fragment {
   private final int GALLERY_REQUEST_CODE = 200;
   String photoPath;
-
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -55,6 +56,9 @@ public class FinishFragment extends Fragment {
       startActivity(Intent.createChooser(shareIntent,getString(R.string.share_chose_app)));
 
     });
+    btnMenu.setOnClickListener(v -> {
+      Navigation.findNavController(view).navigate(R.id.action_finishFragment_to_splashFragment);
+    });
 
     ivGallery.setOnClickListener(v -> {
       Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -64,10 +68,13 @@ public class FinishFragment extends Fragment {
           GALLERY_REQUEST_CODE
       );
     });
+  }
+  @Override
+  public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+    if (requestCode == GALLERY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+      Log.d("TAG", "requestcodeF: " + requestCode + "resultCodeF :" + resultCode);
 
-
-      btnMenu.setOnClickListener(v -> {
-        Navigation.findNavController(view).navigate(R.id.action_finishFragment_to_splashFragment);
-      });
+    }
   }
 }
