@@ -9,6 +9,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.AttributeSet;
@@ -17,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 
 import com.astend.android.photocutter.R;
 import com.astend.android.photocutter.utils.Utils;
@@ -227,9 +230,12 @@ public class CropView extends View {
 
     String state = Environment.getExternalStorageState();
 
-    if (state == Environment.MEDIA_MOUNTED)
+    if (state.equals(Environment.MEDIA_MOUNTED))
+      //file = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+      file = new File(Environment.getExternalStorageDirectory(), getContext().getString(R.string.dir_name));
 
-      file = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+      if (!file.exists())
+        file.mkdir();
       file = new File(file, getContext().getString(R.string.prefix_file_name) + "_" + System.currentTimeMillis() + ".jpg");
 
     try {
@@ -255,15 +261,16 @@ public class CropView extends View {
     } catch (Exception e) {
       e.printStackTrace();
     }
+
     try {
-      MediaStore.Images.Media.insertImage(getContext().getContentResolver(), file.getAbsolutePath(), file.getName(), "");
-      Utils.addImageToGallery(getContext(),file);
-//      MediaScannerConnection.scanFile(
-//          getContext(),
-//          new String[]{file.toString()},
-//          null,
-//          (path, uri) -> Log.d("TAG", "onScanCompleted: " + path));
-    } catch (FileNotFoundException e) {
+      //MediaStore.Images.Media.insertImage(getContext().getContentResolver(), file.getAbsolutePath(), file.getName(), "");
+      Utils.addImageToGallery(getContext(), file);
+      /*MediaScannerConnection.scanFile(
+          getContext(),
+          new String[]{file.toString()},
+          null,
+          (path, uri) -> Log.d("TAG", "onScanCompleted: " + path));*/
+    } catch (Exception e) {
       e.printStackTrace();
     }
     return file;

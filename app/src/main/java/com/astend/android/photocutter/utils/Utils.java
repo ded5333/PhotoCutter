@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 
+import androidx.core.content.FileProvider;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -90,6 +92,7 @@ public class Utils {
   }
   public static void addImageToGallery(Context context,File file){
     Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+    //Uri uri = FileProvider.getUriForFile(context, context.getPackageName() + ".provider" , file);
 //    File file = new File()
     Uri uri = Uri.fromFile(file);
     intent.setData(uri);
